@@ -1,8 +1,8 @@
 #coding:utf-8
 from ai import wgobject,wgruler,wgsdata,common
 import random,time,sys
-# import pandas as pd
-# import numpy as np
+import pandas as pd
+import numpy as np
 sys.path.append('../interface/')
 '''AI类 调用接口读取态势数据，生成动作以及动作执行'''
 class AI:
@@ -19,6 +19,8 @@ class AI:
             self.dic_metadata = {'l_obops': [], 'l_ubops': [], 'l_cities': [], 'l_stage': []}
             # 记录最初始算子
             self.my_obops = []
+            # 用来记录敌方算子信息，包含id, pos, type, lookPos(观察点的位置)
+            self.rival_record = pd.DataFrame(columns=['ObjID', 'Type', 'ObjPos', 'LookPos'])
             self.updateSDData() # 更新态势数据
             # 用来记录战车是否在第三次机动过程中完成兵力投放
             self.already_complete_in_third = {str(self.dic_metadata['l_obops'][0].ObjID): False,
@@ -76,6 +78,7 @@ class AI:
                 # 张庶修改
                 if [bop.ObjID, bop.ObjTypeX] not in self.my_obops:
                     self.my_obops.append([bop.ObjID, bop.ObjTypeX])
+
         # 敌方算子
             self.dic_metadata['l_ubops'] = []
             df_enemyOp = self.obj_interface.getEnemyOperatorsData()
@@ -83,6 +86,14 @@ class AI:
                 bop = wgobject.Gen_Op(row)
                 bop = wgruler.cvtMapBop2AIBop(bop, self.dic_metadata['l_stage'])
                 self.dic_metadata['l_ubops'].append(bop)
+                # 张庶修改
+                if self.rival_record.loc[self.rival_record['ObjID'] == bop.ObjID].empty:
+                    print('添加新的记录==》{}'.format(bop.ObjID))
+                    self.rival_record = self.rival_record.append(pd.DataFrame({'ObjID': [bop.ObjID],
+                                                                               'Type': [bop.ObjTypeX],
+                                                                               'ObjPos': [bop.ObjPos],
+                                                                               'LookPos': None}),
+                                                                 ignore_index=True)
 
             # 堆叠检查
             wgruler.stackCheck(self.dic_metadata['l_obops'])
@@ -142,6 +153,7 @@ class AI:
 
     def doAction(self):
         try:
+            print(u'对方位置记录==》{}'.format(self.rival_record))
             # 蓝方部署阶段
             # 当前态势
             l_ourbops = self.dic_metadata['l_obops']  # 我方算子
