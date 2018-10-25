@@ -2,6 +2,7 @@
 
 from ai import common, hex, wgstage
 
+
 def Shooting (list_g_stage , bop_attacker , bop_obj ):
     '''外部规则针对射击动作的判断(只关注射击动作)
         第一批: 'S' (射击) | 'N'(不允许射击) | 'MS' 移动射击组合动作(针对坦克) |  'TS' 测试射击能力(针对战车/人员在机动阶段可以射击,需要测试是否保留该射击能力到最终阶段的情况)
@@ -9,7 +10,7 @@ def Shooting (list_g_stage , bop_attacker , bop_obj ):
     '''
     try:
         # 处于同格状态的算子不能做射击动作
-        if bop_attacker.ObjTongge == 1: return 'N'
+        if bop_attacker.ObjTongge == 1 or bop_obj.ObjTongge == 1: return 'N' #2018年10月24日添加：处于同格的算子不能被射击
         # 被压制的人员算子无法射击(同时也无法机动)
         if bop_attacker.ObjTypeX == 2 and bop_attacker.ObjKeep == 1: return 'N'
         #  处于行军状态的算子(车辆算子)无法射击
@@ -21,7 +22,8 @@ def Shooting (list_g_stage , bop_attacker , bop_obj ):
             if wgstage.isMoveHuanJie(list_g_stage): # 机动环节
                 if bop_attacker.ObjTypeX == 0:# 坦克
                     if bop_attacker.ObjAttack == 0:# 未射击过
-                        # ObjStep 当前机动力
+                        if bop_attacker.ObjStep == bop_attacker.ObjStepMax: # 2018年10月24日添加：坦克未机动不能射击
+                            return 'N'
                         return 'MS' if bop_attacker.ObjStep > 0  else 'S'
                     else: return 'N' # 已射击过
                 if bop_attacker.ObjTypeX >= 1:# 战车与人员

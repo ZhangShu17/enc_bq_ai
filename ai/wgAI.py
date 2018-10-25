@@ -89,7 +89,7 @@ class AI:
             wgruler.stackCheck(self.dic_metadata['l_ubops'])
             #同格检查
             wgruler.tonggeCheck(self.dic_metadata['l_obops'], self.dic_metadata['l_ubops'])
-            wgruler.tonggeCheck(self.dic_metadata['l_obops'], self.dic_metadata['l_ubops'])
+            wgruler.tonggeCheck(self.dic_metadata['l_ubops'], self.dic_metadata['l_obops'])
 
             #城市列表
             df_city = self.obj_interface.getCityData()
@@ -142,7 +142,6 @@ class AI:
 
     def doAction(self):
         try:
-            print('我的算子={}'.format(self.my_obops))
             # 蓝方部署阶段
             # 当前态势
             l_ourbops = self.dic_metadata['l_obops']  # 我方算子
@@ -159,54 +158,48 @@ class AI:
                     for obj_bop in l_enemybops:
                         flag, weaponID = self.genShootAction(att_bop, obj_bop)  # 判断是否可以射击,若可以射击，返回最佳射击武器
                         if flag:  # 可以射击
-                            exe_success, _ = self.obj_interface.setFire(att_bop.ObjID, obj_bop.ObjID,
+                            exe_success, result = self.obj_interface.setFire(att_bop.ObjID, obj_bop.ObjID,
                                                                         (int)(weaponID))  # 调用接口执行射击动作
                             if exe_success == 0:  # 执行成功
+                                print('打印射击裁决结果==>{}'.format(result))
                                 return True
                 # 按照策略进行机动行军
                 # 蓝方第一次机动
                 if current_stage[0] == 0 and current_stage[1] == 1 and current_stage[2] == 1:
                     # 算子0为80080(1640)处的战车；算子1为80082(1641)处的战车；
                     # 算子2为70081(1540)处的坦克; 算子3为80081(1740)处的坦克
-                    move_obj_list = [80069, 90070, 90073, 90070]
+                    move_obj_list = [80069, 90070, 90072, 90070]
                     for i in range(len(l_ourbops)):
                         boolen, l_path = self.genMoveAction(l_ourbops[i], move_obj_list[i])
-                        print('i={}'.format(i))
-                        print('bollen={}'.format(boolen))
-                        print('l_path=: {}'.format(l_path))
                         if boolen:
-                            self.shootingOnMoving(l_ourbops[i], l_path)
+                            # self.shootingOnMoving(l_ourbops[i], l_path)
+                            self.obj_interface.setMove(l_ourbops[i].ObjID, l_path)
                     return True
                 # 蓝方第二次机动环节 行军
                 if current_stage[0] == 0 and current_stage[1] == 3 and current_stage[2] == 1:
                     move_obj_list = [[80069, 80070, 70069, 70067, 70065, 70063, 80062, 80061, 90060, 90058, 90057, 100056, 100055, 110054],
-                                     [90070, 80069, 80070, 70069, 70067, 70065, 70063, 80062, 80061, 90060, 90058],
-                                     [90073, 90071, 90070, 80069, 80070, 70069, 70067, 70065, 70063],
-                                     [90070, 80069, 80070, 70069, 70067, 70065, 70063, 80062, 80061, 90060, 90058]
+                                     [90070, 90068, 90066, 90064, 90062, 90060, 90058, 90056],
+                                     [90072, 90070, 90068, 90066, 90064, 90062, 90060],
+                                     [90070, 80069, 80070, 70069, 70067, 70065, 70063, 80062, 80061, 90060]
                                      ]
-                    l_ourbops[2], l_ourbops[3] = l_ourbops[3], l_ourbops[2]
-                    move_obj_list[2], move_obj_list[3] = move_obj_list[3], move_obj_list[2]
                     # 切换成行军状态
                     for i in range(len(l_ourbops)):
                         # 切换成行军状态
-                        state_change_bollen = self.obj_interface.setState(l_ourbops[i].ObjID, 1)
-                        print('state_change_bollen={}'.format(state_change_bollen))
+                        if i == 0 or i == 3:
+                            state_change_bollen = self.obj_interface.setState(l_ourbops[i].ObjID, 1)
                         # 获取当前算子的位置
                         cur_pos = l_ourbops[i].ObjPos
                         # 在move_obj_list中的索引位置
                         index = move_obj_list[i].index(cur_pos)
                         if index < len(move_obj_list[i])-1:
-                            move_obj_list[i] = move_obj_list[i][index:]
+                            move_obj_list[i] = move_obj_list[i][index+1:]
                             self.obj_interface.setMove(l_ourbops[i].ObjID, move_obj_list[i])
                     return True
                 # 蓝方第三次机动，下步兵
                 if current_stage[0] == 1 and current_stage[1] == 1 and current_stage[2] == 1:
-                    print(u'我的曾经拥有的算子为{}'.format(self.my_obops))
                     for index, my_bop in enumerate(l_ourbops):
-                        print('当前算子====》{}'.format([my_bop.ObjID, my_bop.ObjTypeX]))
                         # 切换成机动状态
                         state_change_bollen = self.obj_interface.setState(my_bop.ObjID, 0)
-                        print('state_change_bollen={}'.format(state_change_bollen))
                         obj_pos_solider = -1
                         obj_pos_back = -1
                         obj_tank = -1
@@ -215,31 +208,38 @@ class AI:
                             obj_pos_back = 90053
                         elif self.my_obops.index([my_bop.ObjID, my_bop.ObjTypeX]) == 1:  # 第二个战车
                             obj_pos_solider = 90054
-                            obj_pos_back = 90058
+                            obj_pos_back = 90060
                         elif self.my_obops.index([my_bop.ObjID, my_bop.ObjTypeX]) == 2:  # 第一个坦克
-                            obj_tank = 90055
+                            obj_tank = 90053
                         elif self.my_obops.index([my_bop.ObjID, my_bop.ObjTypeX]) == 3:  # 第二个坦克
                             obj_tank = 90053
 
                         # 战车到达步兵下车地点并让步兵下车，并机动到另一地点
                         if obj_pos_solider > 0:
+
                             if not self.already_complete_in_third[str(my_bop.ObjID)]:
                                 boolen_1, l_path_1 = self.genMoveAction(my_bop, obj_pos_solider)
                                 if boolen_1:
                                     self.shootingOnMoving(my_bop, l_path_1)
-                                if my_bop.ObjPos == obj_pos_solider:
-                                    print(u'我已经到达放兵地点')
-                                    print('ObjSonNum={}'.format(my_bop.ObjSonNum))
-                                    print('genGetOffAction={}'.format(self.genGetOffAction(my_bop)))
-                                    print(u'我已经到达放兵地点=========END')
-                                    if my_bop.ObjSonNum == 1:
-                                        if self.genGetOffAction(my_bop):
-                                            self.obj_interface.setGetoff(my_bop.ObjID)  # 调用接口执行下车动作
-                                        print('=========步兵下车=============')
-                                    boolen_2, l_path_2 = self.genMoveAction(my_bop, obj_pos_back)
-                                    if boolen_2:
-                                        self.shootingOnMoving(my_bop, l_path_2)
-                                    self.already_complete_in_third[str(my_bop.ObjID)] = True
+
+                                # 更新本方算子
+                                self.updateSDData()
+                                exist = False
+                                for index, bop in enumerate(self.dic_metadata['l_obops']):
+                                    if my_bop.ObjID == bop.ObjID:
+                                        my_bop = bop
+                                        exist = True
+                                        break
+
+                                if exist:
+                                    if my_bop.ObjPos == obj_pos_solider:
+                                        if my_bop.ObjSonNum == 1:
+                                            if self.genGetOffAction(my_bop):
+                                                self.obj_interface.setGetoff(my_bop.ObjID)  # 调用接口执行下车动作
+                                        boolen_2, l_path_2 = self.genMoveAction(my_bop, obj_pos_back)
+                                        if boolen_2:
+                                            self.shootingOnMoving(my_bop, l_path_2)
+                                        self.already_complete_in_third[str(my_bop.ObjID)] = True
 
                         # 如果是坦克，坦克机动到指定地点
                         if obj_tank > 0:
@@ -437,23 +437,34 @@ class AI:
 
     # 行进间射击
     def shootingOnMoving(self, my_bop, l_path):
-        l_enemybops = self.dic_metadata['l_ubops']  # 敌方算子
-        l_path_troops = []
-        for index in range(len(l_path) - 1):
-            l_path_troops.append([l_path[index], l_path[index + 1]])
-        print('l_path_troops = {}'.format(l_path_troops))
-        for index, item in enumerate(l_path_troops):
-            # 判断是否能攻击
-            for obj_bop_enemy in l_enemybops:
-                flag, weaponID = self.genShootAction(my_bop,
-                                                     obj_bop_enemy)  # 判断是否可以射击,若可以射击，返回最佳射击武器
-                if flag:  # 可以射击
-                    exe_success, _ = self.obj_interface.setFire(my_bop.ObjID,
-                                                                obj_bop_enemy.ObjID,
-                                                                (int)(weaponID))  # 调用接口执行射击动作
-                    if exe_success == 0:  # 执行成功
-                        print('机动中攻击:{}===>>{}'.format(my_bop.ObjPos, obj_bop_enemy.ObjPos))
-            self.obj_interface.setMove(my_bop.ObjID, item)
+        already_shooting = False
+        for index, item in enumerate(l_path):
+            boolen_1 = self.obj_interface.setMove(my_bop.ObjID, [item])
+            print(u'打印行进间射击执行结果={}'.format(boolen_1))
+            if not already_shooting:
+                self.updateSDData()
+                l_enemybops = self.dic_metadata['l_ubops']  # 敌方算子
+                l_ourbops = self.dic_metadata['l_obops']  # 我方算子
+                for index, ele in enumerate(l_ourbops):
+                    if ele.ObjID == my_bop.ObjID:
+                        my_bop = ele
+                        break
+                print('行进间射击敌方算子={}'.format(l_enemybops))
+                # 判断是否能攻击
+                for obj_bop_enemy in l_enemybops:
+                    flag, weaponID = self.genShootAction(my_bop,
+                                                         obj_bop_enemy)  # 判断是否可以射击,若可以射击，返回最佳射击武器
+                    print(u'是否可以射击 flag={}'.format(flag))
+                    if flag:  # 可以射击
+                        exe_success, result = self.obj_interface.setFire(my_bop.ObjID,
+                                                                    obj_bop_enemy.ObjID,
+                                                                    (int)(weaponID))  # 调用接口执行射击动作
+
+                        if exe_success == 0:  # 执行成功
+                            already_shooting = True
+                            print(u'打印行进间射击裁决结果==>{}'.format(result))
+                            print('行进间射击:{}===>>{}'.format(my_bop.ObjPos, obj_bop_enemy.ObjPos))
+                            break
 
     def __del__(self):
         if self.obj_interface is not None:
