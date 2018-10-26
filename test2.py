@@ -7,6 +7,7 @@ sys.path.append('./interface/')
 import __wginterface as wginterface
 # 原AI
 from ai import wgAI
+import time
 
 # 个人AI
 # from enc_ai import enc_ai_main as wgAI
@@ -29,14 +30,11 @@ if __name__ == '__main__':
     obj_interface = None
     obj_ai = None
     try:
+
         obj_interface = wginterface.AI_InterFace(ipaddress = ip,roomID = roomid,gameColor = flag_ai_color,num_xd = num_xd)
         print('='*20+'\n'+'u成功启动AI'+'\n'+'='*20 + '\n' + '-'*20)
         obj_ai = wgAI.AI(obj_interface, flag_ai_color)
-        move_obj_list = [80069, 90070, 90070, 90073]
         l_ourbops = obj_ai.dic_metadata['l_obops']  # 我方算子
-        for i in range(len(l_ourbops)):
-            print(l_ourbops[i].ObjPos)
-            print('======================')
 
     except Exception as e:
         print(" " + str(e))
