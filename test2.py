@@ -34,7 +34,15 @@ if __name__ == '__main__':
         obj_interface = wginterface.AI_InterFace(ipaddress = ip,roomID = roomid,gameColor = flag_ai_color,num_xd = num_xd)
         print('='*20+'\n'+'u成功启动AI'+'\n'+'='*20 + '\n' + '-'*20)
         obj_ai = wgAI.AI(obj_interface, flag_ai_color)
-        l_ourbops = obj_ai.dic_metadata['l_obops']  # 我方算子
+        # l_ourbops = obj_ai.dic_metadata['l_obops']  # 我方算子
+        # secon_target_solider = filter(lambda obj: obj.ObjPos == 90060, l_ourbops)
+        # for index, operator in enumerate(list(secon_target_solider)):
+        #     secon_target_solider = operator
+        #     break
+        # print(dir(secon_target_solider.ObjID))
+        print(obj_ai.int4_int6_data)
+        print(obj_ai.motor_90053_driven)
+        print(obj_ai.obj_interface.getLOS(80078, 80077))
 
     except Exception as e:
         print(" " + str(e))

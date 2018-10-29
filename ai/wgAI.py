@@ -1,8 +1,10 @@
 # coding:utf-8
-from ai import wgobject,wgruler,wgsdata,common
+from ai import wgobject,wgruler,wgsdata,common, wgstage
 import random,time,sys
 import pandas as pd
+from tools import tools
 import numpy as np
+import os
 sys.path.append('../interface/')
 
 '''AI类 调用接口读取态势数据，生成动作以及动作执行'''
@@ -23,12 +25,29 @@ class AI:
 			# 记录最初始算子
 			self.my_obops = []
 			# 用来记录敌方算子信息，包含id, pos, type, lookPos(观察点的位置)
-			self.rival_record = pd.DataFrame(columns=['ObjID', 'Type', 'ObjPos', 'LookPos', 'LookStage'])
+			self.rival_record = pd.DataFrame(columns=['ObjID', 'Type', 'ObjPos',
+													  'Keep', 'Blood', 'ObjStep',
+													  'ObjRound', 'ObjAttack',
+													  'LookPos', 'LookStage'])
 			self.updateSDData() # 更新态势数据
 			# 用来记录战车是否在第三次机动过程中完成兵力投放
 			self.already_complete_in_third = {str(self.dic_metadata['l_obops'][0].ObjID): False,
 											  str(self.dic_metadata['l_obops'][1].ObjID): False}
-			# self.mapData = pd.read_csv('map2.csv')
+			# 用来存储步兵是否夺控
+			self.solider_1_occupy = False
+			self.solider_2_occupy = False
+
+			# 轮循时间
+			self.time = 0.5
+
+			# 4位转6位初始数据
+			self.int4_int6_data = tools.get_int4_int6()
+			# 90053处坦克往返机动范围
+			self.motor_90053_driven = [tools.chang_int4_int6(self.int4_int6_data, item) for item in tools.motor_driven]
+			# # 四位通视表
+			# self.view_data = tools.get_view_data()
+
+		# self.mapData = pd.read_csv('map2.csv')
 		except Exception as e:
 			common.echosentence_color(" " + str(e))
 			self.__del__()
@@ -52,7 +71,7 @@ class AI:
 				flag_validAction = self.doAction()  # 执行动作
 				if not flag_validAction:  # 没有有效动作
 					self.wait(self.dic_metadata, self.flag_color) #等待下个有效动作，打印等待信息
-				time.sleep(0.5)
+				time.sleep(self.time)
 		except Exception as e:
 			common.echosentence_color(" " + str(e))
 			self.__del__()
@@ -62,7 +81,7 @@ class AI:
 			self.__del__()
 			raise
 
-	def updateSDData(self):
+	def updateSDData(self, LookPos=None):
 		'''
 		更新态势数据，放在成员变量dic_metadata中
 		:return:
@@ -89,7 +108,7 @@ class AI:
 				bop = wgobject.Gen_Op(row)
 				bop = wgruler.cvtMapBop2AIBop(bop, self.dic_metadata['l_stage'])
 				self.dic_metadata['l_ubops'].append(bop)
-				self.update_rival_record(bop)
+				self.update_rival_record(bop, LookPos)
 
 			# 堆叠检查
 			wgruler.stackCheck(self.dic_metadata['l_obops'])
@@ -159,23 +178,18 @@ class AI:
 			color = self.flag_color
 			# 当前环节
 			current_stage = self.dic_metadata['l_stage']
+			stage_step = [current_stage[0], current_stage[1], current_stage[2]]
 			# 我方是蓝方
 			if color == 1:
-				# 射能射击就射击
-				for att_bop in l_ourbops:
-					for obj_bop in l_enemybops:
-						flag, weaponID = self.genShootAction(att_bop, obj_bop)  # 判断是否可以射击,若可以射击，返回最佳射击武器
-						if flag:  # 可以射击
-							exe_success, result = self.obj_interface.setFire(att_bop.ObjID, obj_bop.ObjID,
-																		(int)(weaponID))  # 调用接口执行射击动作
-							if exe_success == 0:  # 执行成功
-								print('打印射击裁决结果==>{}'.format(result))
-								print('射杀敌人,删除一条记录，当前对方棋子记录===>{}'.format(self.rival_record))
-								self.delete_rival_record(obj_bop)
-								return True
+				# 如果是红方机动环节，刷新时间设置为0.1s
+				if wgstage.isMyMoveHuanJie(current_stage, 0):
+					self.time = 0.1
+				else:
+					self.time = 0.5
+				self.shooting_for_chance()
 				# 按照策略进行机动行军
 				# 蓝方第一次机动
-				if current_stage[0] == 0 and current_stage[1] == 1 and current_stage[2] == 1:
+				if stage_step == [0, 1, 1]:
 					# 算子0为80080(1640)处的战车；算子1为80082(1641)处的战车；
 					# 算子2为70081(1540)处的坦克; 算子3为80081(1740)处的坦克
 					move_obj_list = [80069, 90070, 90072, 90070]
@@ -186,8 +200,9 @@ class AI:
 							self.obj_interface.setMove(l_ourbops[i].ObjID, l_path)
 					return True
 				# 蓝方第二次机动环节 行军
-				if current_stage[0] == 0 and current_stage[1] == 3 and current_stage[2] == 1:
-					move_obj_list = [[80069, 80070, 70069, 70067, 70065, 70063, 80062, 80061, 90060, 90058, 90057, 100056, 100055, 110054],
+				if stage_step == [0, 3, 1]:
+					move_obj_list = [[80069, 80070, 70069, 70067, 70065, 70063, 80062, 80061, 90060, 90058, 90057,
+									  100056, 100055, 110054],
 									 [90070, 90068, 90066, 90064, 90062, 90060, 90058, 90056],
 									 [90072, 90070, 90068, 90066, 90064, 90062, 90060],
 									 [90070, 80069, 80070, 70069, 70067, 70065, 70063, 80062, 80061, 90060]
@@ -206,7 +221,7 @@ class AI:
 							self.obj_interface.setMove(l_ourbops[i].ObjID, move_obj_list[i])
 					return True
 				# 蓝方第三次机动，下步兵
-				if current_stage[0] == 1 and current_stage[1] == 1 and current_stage[2] == 1:
+				if stage_step == [1, 1, 1]:
 					for index, my_bop in enumerate(l_ourbops):
 						# 切换成机动状态
 						state_change_bollen = self.obj_interface.setState(my_bop.ObjID, 0)
@@ -256,6 +271,66 @@ class AI:
 							boolen_3, l_path_3 = self.genMoveAction(my_bop, obj_tank)
 							if boolen_3:
 								self.shootingOnMoving(my_bop, l_path_3)
+					return True
+				# 蓝方第四次机动，步兵考虑是否能夺控
+				if stage_step == [1, 3, 1]:
+					print('第四次机动')
+					# 判断100051处的棋子是否存在
+					secon_target_solider = None
+					for index, operator in enumerate(l_ourbops):
+						if operator.ObjPos == 100051:
+							secon_target_solider = operator
+							break
+					if secon_target_solider:
+						if not self.solider_2_occupy:
+							self.shootingOnMoving(secon_target_solider, [100049])
+							# 夺控
+							result = self.obj_interface.setOccupy(secon_target_solider.ObjID)
+							if result == 0:
+								self.solider_2_occupy = True
+							self.obj_interface.setMove(secon_target_solider.ObjID, [100051])
+					# 判断90054处的棋子是否存在, 步兵前进
+					first_target_solider = None
+					for index, operator in enumerate(l_ourbops):
+						if operator.ObjPos == 90054:
+							first_target_solider = operator
+							break
+					if first_target_solider:
+						boolen, l_path = self.genMoveAction(first_target_solider, 80051)
+						if boolen:
+							self.shootingOnMoving(first_target_solider, l_path)
+					# 90060的战车走到80060
+					car_obj_1 = None
+					for index, operator in enumerate(l_ourbops):
+						if operator.ObjPos == 90060:
+							car_obj_1 = operator
+							break
+					if car_obj_1:
+						state_change_bollen = self.obj_interface.setState(car_obj_1.ObjID, 1)
+						move_path = [90060, 80061, 80062, 70063, 70065, 70067, 70069, 80070]
+						# 获取当前算子的位置
+						cur_pos = car_obj_1.ObjPos
+						# 在move_obj_list中的索引位置
+						index = move_path.index(cur_pos)
+						if index < len(move_path) - 1:
+							move_path = move_path[index + 1:]
+							self.shootingOnMoving(car_obj_1, move_path)
+
+					# 坦克根据对方出现的记录及通视表进行机动打击
+					tank_obj = []
+					for index, operator in enumerate(l_ourbops):
+						if operator.ObjPos == 90060:
+							tank_obj.append(operator)
+
+					# 在当前机动阶段所观察到的棋子
+					if len(tank_obj):
+						rival_current = self.rival_record.loc[self.rival_record['LookStage'] == [1, 3, 1]]
+						for i, rival in rival_current.iterrows():
+							for pos in self.motor_90053_driven:
+								if self.obj_interface.getLOS(rival['ObjPos'], pos)[0]==0 and \
+									self.obj_interface.getLOS(rival['ObjPos'], pos)[1]>0:
+									pass
+						pass
 					return True
 			return False
 		except Exception as e:
@@ -450,30 +525,21 @@ class AI:
 		already_shooting = False
 		for index, item in enumerate(l_path):
 			boolen_1 = self.obj_interface.setMove(my_bop.ObjID, [item])
-			print(u'打印行进间射击执行结果={}'.format(boolen_1))
-			self.updateSDData()
+			self.updateSDData(LookPos=int(item))
 			l_enemybops = self.dic_metadata['l_ubops']  # 敌方算子
 			l_ourbops = self.dic_metadata['l_obops']  # 我方算子
-			# 战车和人：只侦查不打击
-			if my_bop.ObjTypeX == 1 or my_bop.ObjTypeX == 2:
-				print('行进间射击敌方算子={}'.format(l_enemybops))
-				for obj_bop_enemy in l_enemybops:
-					self.update_rival_record(obj_bop_enemy, LookPos=int(item))
-			# 坦克：既侦查又打击
-			else:
+
+			# 坦克：打击
+			if my_bop.ObjTypeX == 0:
 				for index, ele in enumerate(l_ourbops):
 					if ele.ObjID == my_bop.ObjID:
 						my_bop = ele
 						break
-				print('行进间射击敌方算子={}'.format(l_enemybops))
 				# 判断是否能攻击
 				for obj_bop_enemy in l_enemybops:
-					# 侦查
-					self.update_rival_record(obj_bop_enemy, LookPos=int(item))
 					# 打击
 					if not already_shooting:
 						flag, weaponID = self.genShootAction(my_bop, obj_bop_enemy)  # 判断是否可以射击,若可以射击，返回最佳射击武器
-						print(u'是否可以射击 flag={}'.format(flag))
 						if flag:  # 可以射击
 							exe_success, result = self.obj_interface.setFire(my_bop.ObjID,
 																		obj_bop_enemy.ObjID,
@@ -482,15 +548,15 @@ class AI:
 							if exe_success == 0:  # 执行成功
 
 								already_shooting = True
-								print(u'打印行进间射击裁决结果==>{}'.format(result))
 								print('行进间射击:{}===>>{}'.format(my_bop.ObjPos, obj_bop_enemy.ObjPos))
-								if result.ix[result.index[0]]['Kills'] == 0:
+								if result.ix[result.index[0]]['Kills'] == 1:
 									self.delete_rival_record(obj_bop_enemy)
 									print('射杀敌方算子，删除一条记录，当前记录==>{}'.format(self.rival_record))
 								break
 
 	# 更新敌方棋子记录
 	def update_rival_record(self, bop, LookPos=None):
+		print('答应LookPos是否传值==={}'.format(LookPos))
 		stage = self.dic_metadata['l_stage']
 		if self.rival_record.loc[self.rival_record['ObjID'] == bop.ObjID].empty:
 			print('添加新的记录==》{}'.format(bop.ObjID))
@@ -498,6 +564,11 @@ class AI:
 				'ObjID': [bop.ObjID],
 				'Type': [bop.ObjTypeX],
 				'ObjPos': [bop.ObjPos],
+				'Keep': [bop.ObjKeep],
+				'Blood': [bop.ObjBlood],
+				'ObjRound': [bop.ObjRound],
+				'ObjAttack': [bop.ObjAttack],
+				'ObjStep': [bop.ObjStep],
 				'LookPos': None if not LookPos else [LookPos],
 				'LookStage': [[stage[0], stage[1], stage[2]]]
 			}), ignore_index=True)
@@ -506,10 +577,85 @@ class AI:
 			index = self.rival_record.loc[self.rival_record['ObjID'] == bop.ObjID].index[0]
 			print('当前敌方算子记录======>{}'.format(self.rival_record))
 			self.rival_record.ix[index]['LookStage'] = [stage[0], stage[1], stage[2]]
+			self.rival_record.ix[index]['LookPos'] = None if not LookPos else [LookPos]
+			self.rival_record.ix[index]['ObjStep'] = [bop.ObjStep]
+			self.rival_record.ix[index]['ObjAttack'] = [bop.ObjAttack]
+			self.rival_record.ix[index]['ObjRound'] = [bop.ObjRound]
+			self.rival_record.ix[index]['Blood'] = [bop.ObjBlood]
+			self.rival_record.ix[index]['Keep'] = [bop.ObjKeep]
+			self.rival_record.ix[index]['ObjPos'] = [bop.ObjPos]
 
 	def delete_rival_record(self, bop):
 		index = self.rival_record.loc[self.rival_record['ObjID'] == bop.ObjID].index[0]
 		self.rival_record.drop([index], inplace=True)
+
+	# 机会射击及最终射击
+	def shooting_for_chance(self):
+		# 射能射击就射击
+		l_ourbops = self.dic_metadata['l_obops']  # 我方算子
+		l_enemybops = self.dic_metadata['l_ubops']  # 敌方算子
+		for att_bop in l_ourbops:
+			for obj_bop in l_enemybops:
+				flag, weaponID = self.genShootAction(att_bop, obj_bop)  # 判断是否可以射击,若可以射击，返回最佳射击武器
+				if flag:  # 可以射击
+					exe_success, result = self.obj_interface.setFire(att_bop.ObjID, obj_bop.ObjID,
+																	 (int)(weaponID))  # 调用接口执行射击动作
+					if exe_success == 0:  # 执行成功
+						if result.ix[result.index[0]]['Kills'] == 1:
+							self.delete_rival_record(obj_bop)
+							print('射杀敌方算子，删除一条记录，当前记录==>{}'.format(self.rival_record))
+						return True
+
+	# 我方坦克对当前敌方棋子进行射击策略
+	def shooting_rival_by_tank(self, tank_obj_list, rival_data_frame):
+		if len(tank_obj_list):
+			shooting_view = []
+			for index, row in rival_data_frame.iterrows():
+				for shoot_pos in self.motor_90053_driven:
+					getLos = self.obj_interface.getLOS(row['ObjPos'], shoot_pos)
+					if getLos[0] == 0 and getLos[1] > 0:
+						shooting_view.append({'ObjID': row['ObjID'], 'Type': row['Type'],
+											  'ShootPos': shoot_pos, 'Length': getLos[1]})
+
+			shooting_view.sort(key=lambda e: e['Length'])
+			shooting_view.sort(key=lambda e: e['Type'])
+			if len(shooting_view):
+				loc_index = tools.motor_driven.index(tools.chang_int6_int4(self.int4_int6_data,
+																		   shooting_view[0]['ShootPos']))
+				path = [tools.chang_int4_int6(self.int4_int6_data, ele) for ele in tools.moter_driven_path[loc_index]]
+				# 坦克机动
+				self.obj_interface.setMove(tank_obj_list[0].ObjID, path)
+				self.updateSDData()
+				l_enemybops = self.dic_metadata['l_ubops']  # 敌方算子
+				l_ourbops = self.dic_metadata['l_obops']  # 我方算子
+
+				my_bop = None
+				for index, ele in enumerate(l_ourbops):
+					if ele.ObjID == tank_obj_list[0].ObjID:
+						my_bop = ele
+						break
+				rival_bop = None
+				for index, ele in enumerate(l_enemybops):
+					if ele.ObjID == shooting_view[0]['ObjID']:
+						rival_bop = ele
+						break
+				# 坦克射击
+				if my_bop and rival_bop:
+					flag, weaponID = self.genShootAction(my_bop, rival_bop)
+					if flag:
+						exe_success, result = self.obj_interface.setFire(my_bop.ObjID,
+																		 rival_bop.ObjID,
+																	(int)(weaponID))  # 调用接口执行射击动作
+
+						if exe_success == 0:  # 执行成功
+							print('坦克到达指定通视点进行射击:{}===>>{}'.format(my_bop.ObjPos, rival_bop.ObjPos))
+							if result.ix[result.index[0]]['Kills'] == 1:
+								self.delete_rival_record(rival_bop)
+								print('射杀敌方算子，删除一条记录，当前记录==>{}'.format(self.rival_record))
+				# 射击完成后，坦克按原路返回
+				path.reverse()
+				self.obj_interface.setMove(tank_obj_list[0].ObjID, path)
+
 
 	def __del__(self):
 		if self.obj_interface is not None:
