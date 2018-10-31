@@ -2,15 +2,9 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="9aae8f00-f559-4bdd-b87d-f677b73b0035" name="Default Changelist" comment="">
-      <change afterPath="$PROJECT_DIR$/ai/res_pos_cvt.csv" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/tools/__init__.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/tools/res_pos_cvt.csv" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/tools/tools.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/ai/hex.py" beforeDir="false" afterPath="$PROJECT_DIR$/ai/hex.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/ai/wgAI.py" beforeDir="false" afterPath="$PROJECT_DIR$/ai/wgAI.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/enc_ai/test_python_methods.py" beforeDir="false" afterPath="$PROJECT_DIR$/enc_ai/test_python_methods.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/test2.py" beforeDir="false" afterPath="$PROJECT_DIR$/test2.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/tools/tools.py" beforeDir="false" afterPath="$PROJECT_DIR$/tools/tools.py" afterDir="false" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="SHOW_DIALOG" value="false" />
@@ -25,49 +19,51 @@
     <session id="-527265">
       <usages-collector id="statistics.lifecycle.project">
         <counts>
-          <entry key="project.closed" value="24" />
+          <entry key="project.closed" value="30" />
           <entry key="project.open.time.1" value="1" />
           <entry key="project.open.time.10" value="1" />
+          <entry key="project.open.time.2" value="1" />
           <entry key="project.open.time.24" value="2" />
           <entry key="project.open.time.25" value="4" />
-          <entry key="project.open.time.26" value="3" />
+          <entry key="project.open.time.26" value="4" />
           <entry key="project.open.time.27" value="4" />
           <entry key="project.open.time.28" value="2" />
-          <entry key="project.open.time.29" value="1" />
-          <entry key="project.open.time.3" value="1" />
-          <entry key="project.open.time.30" value="1" />
+          <entry key="project.open.time.29" value="2" />
+          <entry key="project.open.time.3" value="2" />
+          <entry key="project.open.time.30" value="2" />
           <entry key="project.open.time.31" value="1" />
-          <entry key="project.open.time.32" value="2" />
+          <entry key="project.open.time.32" value="3" />
+          <entry key="project.open.time.33" value="1" />
           <entry key="project.open.time.34" value="1" />
           <entry key="project.open.time.4" value="1" />
           <entry key="project.open.time.43" value="1" />
           <entry key="project.open.time.80" value="1" />
-          <entry key="project.open.time.9" value="3" />
-          <entry key="project.opened" value="30" />
+          <entry key="project.open.time.9" value="4" />
+          <entry key="project.opened" value="38" />
         </counts>
       </usages-collector>
       <usages-collector id="statistics.file.extensions.open">
         <counts>
           <entry key="csv" value="7" />
-          <entry key="py" value="116" />
+          <entry key="py" value="123" />
           <entry key="so" value="4" />
         </counts>
       </usages-collector>
       <usages-collector id="statistics.file.types.open">
         <counts>
           <entry key="PLAIN_TEXT" value="11" />
-          <entry key="Python" value="116" />
+          <entry key="Python" value="123" />
         </counts>
       </usages-collector>
       <usages-collector id="statistics.file.extensions.edit">
         <counts>
-          <entry key="py" value="16228" />
+          <entry key="py" value="18761" />
           <entry key="tools" value="29" />
         </counts>
       </usages-collector>
       <usages-collector id="statistics.file.types.edit">
         <counts>
-          <entry key="Python" value="16257" />
+          <entry key="Python" value="18790" />
         </counts>
       </usages-collector>
     </session>
@@ -77,18 +73,50 @@
       <file pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/ai/wgAI.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="147">
-              <caret line="661" column="40" lean-forward="true" selection-start-line="661" selection-start-column="40" selection-end-line="661" selection-end-column="40" />
+            <state relative-caret-position="150">
+              <caret line="823" column="42" lean-forward="true" selection-start-line="823" selection-start-column="42" selection-end-line="823" selection-end-column="42" />
               <folding>
                 <element signature="e#15#70#0" expanded="true" />
-                <element signature="e#21803#22235#0" />
-                <marker date="1540741985181" expanded="true" signature="18283:18284" ph="..." />
-                <marker date="1540741985181" expanded="false" signature="19541:19542" ph="..." />
-                <marker date="1540741985181" expanded="true" signature="19541:22322" ph="..." />
-                <marker date="1540741985181" expanded="true" signature="19671:19674" ph="..." />
-                <marker date="1540741985181" expanded="true" signature="19717:22322" ph="..." />
-                <marker date="1540741985181" expanded="true" signature="20432:22322" ph="..." />
-                <marker date="1540741985181" expanded="true" signature="22321:22322" ph="..." />
+                <element signature="e#8897#10611#0" />
+              </folding>
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/enc_ai/test.py">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="168">
+              <caret line="23" selection-start-line="23" selection-end-line="24" />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/enc_ai/enc_ai_main.py">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="-4">
+              <caret line="131" column="8" selection-start-line="131" selection-start-column="8" selection-end-line="131" selection-end-column="8" />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file pinned="false" current-in-tab="false">
+        <entry file="file://$USER_HOME$/.PyCharm2018.2/system/python_stubs/751825378/__wginterface.py">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="2976">
+              <caret line="137" column="8" selection-start-line="137" selection-start-column="8" selection-end-line="137" selection-end-column="8" />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/ai/wgobject.py">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="-4276">
+              <caret line="22" column="36" selection-start-line="22" selection-start-column="28" selection-end-line="22" selection-end-column="36" />
+              <folding>
+                <element signature="e#15#35#0" expanded="true" />
               </folding>
             </state>
           </provider>
@@ -97,8 +125,8 @@
       <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/enc_ai/test_python_methods.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="188">
-              <caret line="40" column="49" lean-forward="true" selection-start-line="40" selection-start-column="49" selection-end-line="40" selection-end-column="49" />
+            <state relative-caret-position="936">
+              <caret line="40" column="49" selection-start-line="40" selection-start-column="49" selection-end-line="40" selection-end-column="49" />
             </state>
           </provider>
         </entry>
@@ -106,13 +134,13 @@
       <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/tools/tools.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="812">
-              <caret line="38" column="17" selection-start-line="38" selection-end-line="38" selection-end-column="17" />
+            <state relative-caret-position="180">
+              <caret line="75" column="71" lean-forward="true" selection-start-line="75" selection-start-column="71" selection-end-line="75" selection-end-column="71" />
               <folding>
                 <element signature="e#16#35#0" expanded="true" />
-                <marker date="1540728503181" expanded="true" signature="373:374" ph="..." />
-                <marker date="1540728503181" expanded="true" signature="373:375" ph="..." />
-                <marker date="1540728503181" expanded="true" signature="486:716" ph="..." />
+                <marker date="1540962472908" expanded="true" signature="373:374" ph="..." />
+                <marker date="1540962472908" expanded="true" signature="373:375" ph="..." />
+                <marker date="1540962472908" expanded="true" signature="486:716" ph="..." />
               </folding>
             </state>
           </provider>
@@ -129,17 +157,10 @@
   </component>
   <component name="FindInProjectRecents">
     <findStrings>
-      <find>Type</find>
-      <find>同格</find>
-      <find>stat</find>
-      <find>行进间射击</find>
-      <find>common</find>
       <find>upda</find>
       <find>update</find>
       <find>对方位置</find>
       <find>setMO</find>
-      <find>setFi</find>
-      <find>setMove</find>
       <find>Keep</find>
       <find>setS</find>
       <find>机动</find>
@@ -159,6 +180,13 @@
       <find>通视</find>
       <find>chang_int4_int6</find>
       <find>genShootAction</find>
+      <find>up</find>
+      <find>shooting_rival_by_tank</find>
+      <find>setFi</find>
+      <find>setMove</find>
+      <find>occupy</find>
+      <find>doAc</find>
+      <find>city</find>
     </findStrings>
     <replaceStrings>
       <replace />
@@ -178,15 +206,15 @@
         <option value="$PROJECT_DIR$/enc_ai/map.py" />
         <option value="$PROJECT_DIR$/enc_ai/enc_ai_main.py" />
         <option value="$PROJECT_DIR$/test_ac_simple.py" />
-        <option value="$PROJECT_DIR$/enc_ai/test.py" />
         <option value="$PROJECT_DIR$/enc_ai/test2.py" />
         <option value="$PROJECT_DIR$/ai/wgruler.py" />
         <option value="$PROJECT_DIR$/ai/wgstage.py" />
         <option value="$PROJECT_DIR$/ai/wgsdata.py" />
         <option value="$PROJECT_DIR$/ai/hex.py" />
-        <option value="$PROJECT_DIR$/tools/tools.py" />
         <option value="$PROJECT_DIR$/test2.py" />
         <option value="$PROJECT_DIR$/enc_ai/test_python_methods.py" />
+        <option value="$PROJECT_DIR$/enc_ai/test.py" />
+        <option value="$PROJECT_DIR$/tools/tools.py" />
         <option value="$PROJECT_DIR$/ai/wgAI.py" />
       </list>
     </option>
@@ -197,11 +225,11 @@
     <detection-done>true</detection-done>
     <sorting>DEFINITION_ORDER</sorting>
   </component>
-  <component name="ProjectFrameBounds" extendedState="6">
-    <option name="x" value="115" />
-    <option name="y" value="164" />
-    <option name="width" value="1218" />
-    <option name="height" value="544" />
+  <component name="ProjectFrameBounds" extendedState="7">
+    <option name="x" value="73" />
+    <option name="y" value="99" />
+    <option name="width" value="1293" />
+    <option name="height" value="636" />
   </component>
   <component name="ProjectInspectionProfilesVisibleTreeState">
     <entry key="Project Default">
@@ -280,7 +308,6 @@
       <foldersAlwaysOnTop value="true" />
     </navigator>
     <panes>
-      <pane id="Scope" />
       <pane id="ProjectPane">
         <subPane>
           <expand>
@@ -307,6 +334,7 @@
           <select />
         </subPane>
       </pane>
+      <pane id="Scope" />
     </panes>
   </component>
   <component name="PropertiesComponent">
@@ -428,6 +456,9 @@
       <module name="python_bq" />
       <option name="INTERPRETER_OPTIONS" value="" />
       <option name="PARENT_ENVS" value="true" />
+      <envs>
+        <env name="PYTHONUNBUFFERED" value="1" />
+      </envs>
       <option name="SDK_HOME" value="" />
       <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$/enc_ai" />
       <option name="IS_MODULE_SDK" value="true" />
@@ -496,10 +527,9 @@
     <servers />
   </component>
   <component name="ToolWindowManager">
-    <frame x="64" y="-11" width="1303" height="780" extended-state="6" />
-    <editor active="true" />
+    <frame x="64" y="-11" width="1303" height="780" extended-state="7" />
     <layout>
-      <window_info active="true" content_ui="combo" id="Project" order="0" visible="true" weight="0.2104845" />
+      <window_info content_ui="combo" id="Project" order="0" visible="true" weight="0.17077045" />
       <window_info id="Structure" order="1" side_tool="true" weight="0.25" />
       <window_info id="Favorites" order="2" side_tool="true" />
       <window_info anchor="bottom" id="Message" order="0" />
@@ -513,8 +543,8 @@
       <window_info anchor="bottom" id="Version Control" order="8" show_stripe_button="false" />
       <window_info anchor="bottom" id="Database Changes" order="9" show_stripe_button="false" />
       <window_info anchor="bottom" id="Event Log" order="10" side_tool="true" />
-      <window_info anchor="bottom" id="Terminal" order="11" weight="0.1648" />
-      <window_info anchor="bottom" id="Python Console" order="12" visible="true" weight="0.3504" />
+      <window_info active="true" anchor="bottom" id="Terminal" order="11" visible="true" weight="0.3072" />
+      <window_info anchor="bottom" id="Python Console" order="12" weight="0.34984025" />
       <window_info anchor="right" id="Commander" internal_type="SLIDING" order="0" type="SLIDING" weight="0.4" />
       <window_info anchor="right" id="Ant Build" order="1" weight="0.25" />
       <window_info anchor="right" content_ui="combo" id="Hierarchy" order="2" weight="0.25" />
@@ -578,13 +608,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/enc_ai/enc_ai_main.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="2496">
-          <caret line="222" column="68" selection-start-line="222" selection-start-column="68" selection-end-line="222" selection-end-column="68" />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$USER_HOME$/VENV/lib/python3.6/site-packages/sqlalchemy/engine/strategies.py">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="2400">
@@ -603,20 +626,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state>
           <caret selection-end-line="1" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/enc_ai/test.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="72">
-          <caret line="3" column="19" lean-forward="true" selection-start-line="3" selection-start-column="19" selection-end-line="3" selection-end-column="19" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$USER_HOME$/.PyCharm2018.2/system/python_stubs/751825378/__wgobject/BasicOperator.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="-4608">
-          <caret line="62" column="4" selection-start-line="62" selection-start-column="4" selection-end-line="62" selection-end-column="4" />
         </state>
       </provider>
     </entry>
@@ -653,16 +662,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/ai/wgsdata.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="48">
-          <caret line="2" column="17" selection-start-line="2" selection-start-column="17" selection-end-line="2" selection-end-column="17" />
-          <folding>
-            <element signature="e#90#444#0" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/ai/wgstage.py">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="336">
@@ -691,9 +690,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="480">
           <caret line="21" column="14" selection-start-line="21" selection-start-column="14" selection-end-line="21" selection-end-column="14" />
-          <folding>
-            <element signature="e#270#288#0" expanded="true" />
-          </folding>
         </state>
       </provider>
     </entry>
@@ -704,26 +700,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$USER_HOME$/.PyCharm2018.2/system/python_stubs/751825378/__wginterface.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="157">
-          <caret line="83" column="8" selection-start-line="83" selection-start-column="8" selection-end-line="83" selection-end-column="8" />
-          <folding>
-            <element signature="e#183#247#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/ai/wgobject.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="576">
-          <caret line="39" column="36" selection-start-line="39" selection-start-column="28" selection-end-line="39" selection-end-column="36" />
-          <folding>
-            <element signature="e#15#35#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$USER_HOME$/.PyCharm2018.2/system/python_stubs/751825378/builtins.py">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="198">
@@ -731,40 +707,81 @@
         </state>
       </provider>
     </entry>
+    <entry file="file://$USER_HOME$/.PyCharm2018.2/system/python_stubs/751825378/__wgobject/BasicOperator.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="-3384">
+          <caret line="41" column="4" selection-start-line="41" selection-start-column="4" selection-end-line="41" selection-end-column="4" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$USER_HOME$/.PyCharm2018.2/system/python_stubs/751825378/__wginterface.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="2976">
+          <caret line="137" column="8" selection-start-line="137" selection-start-column="8" selection-end-line="137" selection-end-column="8" />
+        </state>
+      </provider>
+    </entry>
     <entry file="file://$PROJECT_DIR$/enc_ai/test_python_methods.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="188">
-          <caret line="40" column="49" lean-forward="true" selection-start-line="40" selection-start-column="49" selection-end-line="40" selection-end-column="49" />
+        <state relative-caret-position="936">
+          <caret line="40" column="49" selection-start-line="40" selection-start-column="49" selection-end-line="40" selection-end-column="49" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/enc_ai/enc_ai_main.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="-4">
+          <caret line="131" column="8" selection-start-line="131" selection-start-column="8" selection-end-line="131" selection-end-column="8" />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/tools/tools.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="812">
-          <caret line="38" column="17" selection-start-line="38" selection-end-line="38" selection-end-column="17" />
+        <state relative-caret-position="180">
+          <caret line="75" column="71" lean-forward="true" selection-start-line="75" selection-start-column="71" selection-end-line="75" selection-end-column="71" />
           <folding>
             <element signature="e#16#35#0" expanded="true" />
-            <marker date="1540728503181" expanded="true" signature="373:374" ph="..." />
-            <marker date="1540728503181" expanded="true" signature="373:375" ph="..." />
-            <marker date="1540728503181" expanded="true" signature="486:716" ph="..." />
+            <marker date="1540962472908" expanded="true" signature="373:374" ph="..." />
+            <marker date="1540962472908" expanded="true" signature="373:375" ph="..." />
+            <marker date="1540962472908" expanded="true" signature="486:716" ph="..." />
           </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/ai/wgsdata.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="48">
+          <caret line="2" column="17" selection-start-line="2" selection-start-column="17" selection-end-line="2" selection-end-column="17" />
+          <folding>
+            <element signature="e#90#444#0" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/ai/wgobject.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="-4276">
+          <caret line="22" column="36" selection-start-line="22" selection-start-column="28" selection-end-line="22" selection-end-column="36" />
+          <folding>
+            <element signature="e#15#35#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/enc_ai/test.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="168">
+          <caret line="23" selection-start-line="23" selection-end-line="24" />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/ai/wgAI.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="147">
-          <caret line="661" column="40" lean-forward="true" selection-start-line="661" selection-start-column="40" selection-end-line="661" selection-end-column="40" />
+        <state relative-caret-position="150">
+          <caret line="823" column="42" lean-forward="true" selection-start-line="823" selection-start-column="42" selection-end-line="823" selection-end-column="42" />
           <folding>
             <element signature="e#15#70#0" expanded="true" />
-            <element signature="e#21803#22235#0" />
-            <marker date="1540741985181" expanded="true" signature="18283:18284" ph="..." />
-            <marker date="1540741985181" expanded="false" signature="19541:19542" ph="..." />
-            <marker date="1540741985181" expanded="true" signature="19541:22322" ph="..." />
-            <marker date="1540741985181" expanded="true" signature="19671:19674" ph="..." />
-            <marker date="1540741985181" expanded="true" signature="19717:22322" ph="..." />
-            <marker date="1540741985181" expanded="true" signature="20432:22322" ph="..." />
-            <marker date="1540741985181" expanded="true" signature="22321:22322" ph="..." />
+            <element signature="e#8897#10611#0" />
           </folding>
         </state>
       </provider>

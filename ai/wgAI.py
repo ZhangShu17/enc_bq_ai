@@ -47,6 +47,11 @@ class AI:
 			# # 四位通视表
 			# self.view_data = tools.get_view_data()
 
+			# 蓝方战车侦查路线发现敌人及打击敌人记录表
+			self.car_detect_path_record = []
+			# 蓝方坦克侦查路线发现敌人及打击敌人记录表
+			self.tank_detect_path_record = []
+
 		# self.mapData = pd.read_csv('map2.csv')
 		except Exception as e:
 			common.echosentence_color(" " + str(e))
@@ -174,11 +179,13 @@ class AI:
 			l_ourbops = self.dic_metadata['l_obops']  # 我方算子
 			l_enemybops = self.dic_metadata['l_ubops']  # 敌方算子
 			l_cities = self.dic_metadata['l_cities']  # 夺控点列表
+			l_cityloc = [l_cities[i] for i in range(len(l_cities)) if i % 3 == 0]  # 所有夺控点坐标
 			# 本方颜色
 			color = self.flag_color
 			# 当前环节
 			current_stage = self.dic_metadata['l_stage']
 			stage_step = [current_stage[0], current_stage[1], current_stage[2]]
+			time = current_stage[3]
 			# 我方是蓝方
 			if color == 1:
 				# 如果是红方机动环节，刷新时间设置为0.1s
@@ -233,7 +240,7 @@ class AI:
 							obj_pos_back = 90053
 						elif self.my_obops.index([my_bop.ObjID, my_bop.ObjTypeX]) == 1:  # 第二个战车
 							obj_pos_solider = 90054
-							obj_pos_back = 90060
+							obj_pos_back = 90053
 						elif self.my_obops.index([my_bop.ObjID, my_bop.ObjTypeX]) == 2:  # 第一个坦克
 							obj_tank = 90053
 						elif self.my_obops.index([my_bop.ObjID, my_bop.ObjTypeX]) == 3:  # 第二个坦克
@@ -299,38 +306,64 @@ class AI:
 						boolen, l_path = self.genMoveAction(first_target_solider, 80051)
 						if boolen:
 							self.shootingOnMoving(first_target_solider, l_path)
-					# 90060的战车走到80060
-					car_obj_1 = None
-					for index, operator in enumerate(l_ourbops):
-						if operator.ObjPos == 90060:
-							car_obj_1 = operator
-							break
-					if car_obj_1:
-						state_change_bollen = self.obj_interface.setState(car_obj_1.ObjID, 1)
-						move_path = [90060, 80061, 80062, 70063, 70065, 70067, 70069, 80070]
-						# 获取当前算子的位置
-						cur_pos = car_obj_1.ObjPos
-						# 在move_obj_list中的索引位置
-						index = move_path.index(cur_pos)
-						if index < len(move_path) - 1:
-							move_path = move_path[index + 1:]
-							self.shootingOnMoving(car_obj_1, move_path)
+					# # 90060的战车走到80070
+					# car_obj_1 = None
+					# for index, operator in enumerate(l_ourbops):
+					# 	if operator.ObjPos == 90060:
+					# 		car_obj_1 = operator
+					# 		break
+					# if car_obj_1:
+					# 	state_change_bollen = self.obj_interface.setState(car_obj_1.ObjID, 1)
+					# 	move_path = [90060, 80061, 80062, 70063, 70065, 70067, 70069, 80070]
+					# 	# 获取当前算子的位置
+					# 	cur_pos = car_obj_1.ObjPos
+					# 	# 在move_obj_list中的索引位置
+					# 	index = move_path.index(cur_pos)
+					# 	if index < len(move_path) - 1:
+					# 		move_path = move_path[index + 1:]
+					# 		self.shootingOnMoving(car_obj_1, move_path)
 
 					# 坦克根据对方出现的记录及通视表进行机动打击
-					tank_obj = []
-					for index, operator in enumerate(l_ourbops):
-						if operator.ObjPos == 90060:
-							tank_obj.append(operator)
+					self.shooting_rival_by_tank(self.dic_metadata['l_obops'],
+												self.rival_record,
+												[1, 3, 1])
+					return True
 
-					# 在当前机动阶段所观察到的棋子
-					if len(tank_obj):
-						rival_current = self.rival_record.loc[self.rival_record['LookStage'] == [1, 3, 1]]
-						for i, rival in rival_current.iterrows():
-							for pos in self.motor_90053_driven:
-								if self.obj_interface.getLOS(rival['ObjPos'], pos)[0]==0 and \
-									self.obj_interface.getLOS(rival['ObjPos'], pos)[1]>0:
-									pass
-						pass
+				if stage_step in [[2, 1, 1], [2, 3, 1], [3, 1, 1], [3, 3, 1], [4, 1, 1]]:
+					if not len(l_enemybops):
+						car_obj = []
+						obj_tank = []
+						for operator in l_ourbops:
+							if operator.ObjTypeX == 1:
+								car_obj.append(operator)
+							if operator.ObjTypeX == 0:
+								obj_tank.append(operator)
+						if len(car_obj):
+							self.detect_by_car(stage_step)
+						else:
+							if len(obj_tank):
+								for operator in obj_tank:
+									path1=[tools.chang_int4_int6(self.int4_int6_data, item)
+										   for item in tools.blue_tank_detect_path[0]]
+									path2 = [tools.chang_int4_int6(self.int4_int6_data, item)
+											 for item in tools.blue_tank_detect_path[1]]
+									self.shootingOnMoving(operator, path1)
+									self.shootingOnMoving(operator, path2)
+					return True
+				# 最后一次机动，派一辆战车夺去主要点
+				if stage_step == [4, 3, 1]:
+					if 80048 in l_cityloc:
+						occupy_car = None
+						for operator in l_ourbops:
+							if operator.ObjTypeX == 1 and operator.ObjStep==operator.ObjStepMax:
+								occupy_car = operator
+								break
+						if occupy_car:
+							self.obj_interface.setMove(occupy_car.ObjID, [90051])
+							self.obj_interface.setState(occupy_car.ObjID, 1)
+							self.obj_interface.setMove(occupy_car.ObjID, [90050, 80049, 80048])
+							self.obj_interface.setOccupy(occupy_car.ObjID)
+							self.obj_interface.setMove(occupy_car.ObjID, [80049, 90050])
 					return True
 			return False
 		except Exception as e:
@@ -607,31 +640,51 @@ class AI:
 						return True
 
 	# 我方坦克对当前敌方棋子进行射击策略
-	def shooting_rival_by_tank(self, tank_obj_list, rival_data_frame):
-		if len(tank_obj_list):
+	def shooting_rival_by_tank(self, l_ourbops, rival_record, stage):
+		# 坦克根据对方出现的记录及通视表进行机动打击
+		killing_result = 0
+		tank_obj = []
+		print('l_ourbops={}'.format(l_ourbops))
+		for index, operator in enumerate(l_ourbops):
+			print('===================================')
+			print('operator.ObjPos={}'.format(operator.ObjPos))
+			print('operator.ObjAttack={}'.format(operator.ObjAttack))
+			if operator.ObjPos == 90053 \
+					and operator.ObjAttack == 0 \
+					and operator.ObjTypeX == 0:
+				tank_obj.append(operator)
+		print('tank_obj={}'.format(tank_obj))
+
+		if len(tank_obj):
+			rival_current = rival_record.loc[self.rival_record['LookStage'] == stage]
+			print('rival_current={}'.format(rival_current))
 			shooting_view = []
-			for index, row in rival_data_frame.iterrows():
+			for index, row in rival_current.iterrows():
 				for shoot_pos in self.motor_90053_driven:
 					getLos = self.obj_interface.getLOS(row['ObjPos'], shoot_pos)
 					if getLos[0] == 0 and getLos[1] > 0:
 						shooting_view.append({'ObjID': row['ObjID'], 'Type': row['Type'],
 											  'ShootPos': shoot_pos, 'Length': getLos[1]})
+			print('shooting_view_sort_before={}'.format(shooting_view))
 
 			shooting_view.sort(key=lambda e: e['Length'])
 			shooting_view.sort(key=lambda e: e['Type'])
+			print('shooting_view_after_sort={}'.format(shooting_view))
 			if len(shooting_view):
 				loc_index = tools.motor_driven.index(tools.chang_int6_int4(self.int4_int6_data,
 																		   shooting_view[0]['ShootPos']))
+				print('loc_index={}'.format(loc_index))
 				path = [tools.chang_int4_int6(self.int4_int6_data, ele) for ele in tools.moter_driven_path[loc_index]]
+				print('path={}'.format(path))
 				# 坦克机动
-				self.obj_interface.setMove(tank_obj_list[0].ObjID, path)
+				self.obj_interface.setMove(tank_obj[0].ObjID, path)
 				self.updateSDData()
 				l_enemybops = self.dic_metadata['l_ubops']  # 敌方算子
 				l_ourbops = self.dic_metadata['l_obops']  # 我方算子
 
 				my_bop = None
 				for index, ele in enumerate(l_ourbops):
-					if ele.ObjID == tank_obj_list[0].ObjID:
+					if ele.ObjID == tank_obj[0].ObjID:
 						my_bop = ele
 						break
 				rival_bop = None
@@ -650,12 +703,122 @@ class AI:
 						if exe_success == 0:  # 执行成功
 							print('坦克到达指定通视点进行射击:{}===>>{}'.format(my_bop.ObjPos, rival_bop.ObjPos))
 							if result.ix[result.index[0]]['Kills'] == 1:
+								killing_result = 1
 								self.delete_rival_record(rival_bop)
 								print('射杀敌方算子，删除一条记录，当前记录==>{}'.format(self.rival_record))
 				# 射击完成后，坦克按原路返回
 				path.reverse()
-				self.obj_interface.setMove(tank_obj_list[0].ObjID, path)
+				self.obj_interface.setMove(tank_obj[0].ObjID, path)
+				self.updateSDData()
+				return killing_result
 
+	# 战车机动侦查
+	def detect_by_car(self, stage):
+		# 是否存在满机动力的战车
+		car_obj = []
+		print('l_ourbops={}'.format(self.dic_metadata['l_obops']))
+		for index, operator in enumerate(self.dic_metadata['l_obops']):
+			print('===================================')
+			print('operator.ObjPos={}'.format(operator.ObjPos))
+			print('operator.ObjAttack={}'.format(operator.ObjAttack))
+			if operator.ObjPos == 90053 \
+					and operator.ObjAttack == 0 \
+					and operator.ObjStep == operator.ObjStepMax \
+					and operator.ObjTypeX == 1:
+				car_obj.append(operator)
+		print('car_obj={}'.format(car_obj))
+		# 存在符合条件的战车
+		if len(car_obj):
+			detect_path = None
+			path_all = tools.blue_car_detect_path
+			for index, path in enumerate(tools.blue_car_detect_path):
+				if {'path': path, 'canUse': True, 'stage': stage} in path_all:
+					detect_path = path
+					break
+				else:
+					if {'path': path, 'canUse': False, 'stage': stage} in path_all:
+						del path_all[index]
+			if not detect_path:
+				if len(path_all):
+					detect_path = path_all[0]
+			if detect_path:
+				blue_car_detect_path = [tools.chang_int4_int6(self.int4_int6_data, item)
+										for item in detect_path]
+				print('blue_car_detect_path_1={}'.format(blue_car_detect_path))
+				for path_item in blue_car_detect_path:
+					self.obj_interface.setMove(car_obj[0].ObjID, [path_item])
+					self.updateSDData(LookPos=int(path_item))
+					# 如果发现了敌人，派最符合条件的坦克前去攻击
+					length = len(self.dic_metadata['l_ubops'])
+					if length:
+						# 战车回程
+						path_flee = blue_car_detect_path[blue_car_detect_path.index(path_item):]
+						self.obj_interface.setMove(car_obj[0].ObjID, path_flee)
+						# 坦克发起攻击
+						killing_result = self.shooting_rival_by_tank(self.dic_metadata['l_obops'],
+																	 self.rival_record, stage)
+						if length > 1 or killing_result == 0:
+							self.car_detect_path_record.append({'path': detect_path,
+																'canUse': True, 'stage': stage})
+						else:
+							self.car_detect_path_record.append({'path': detect_path,
+																'canUse': False, 'stage': stage})
+						break
+
+	# # 坦克侦查打击
+	# def detect_by_tank(self, stage):
+	# 	# 是否存在满机动力的战车
+	# 	tank_obj = []
+	# 	print('l_ourbops={}'.format(self.dic_metadata['l_obops']))
+	# 	for index, operator in enumerate(self.dic_metadata['l_obops']):
+	# 		print('===================================')
+	# 		print('operator.ObjPos={}'.format(operator.ObjPos))
+	# 		print('operator.ObjAttack={}'.format(operator.ObjAttack))
+	# 		if operator.ObjPos == 90053 \
+	# 				and operator.ObjAttack == 0 \
+	# 				and operator.ObjStep == operator.ObjStepMax \
+	# 				and operator.ObjTypeX == 0:
+	# 			tank_obj.append(operator)
+	# 	print('tank_obj={}'.format(tank_obj))
+	# 	# 存在符合条件的战车
+	# 	if len(tank_obj):
+	# 		detect_path = None
+	# 		path_all = tools.blue_tank_detect_path
+	# 		for index, path in enumerate(tools.blue_car_detect_path):
+	# 			if {'path': path, 'canUse': True, 'stage': stage} in path_all:
+	# 				detect_path = path
+	# 				break
+	# 			else:
+	# 				if {'path': path, 'canUse': False, 'stage': stage} in path_all:
+	# 					del path_all[index]
+	# 		if not detect_path:
+	# 			if len(path_all):
+	# 				detect_path = path_all[0]
+	# 		if detect_path:
+	# 			tank_car_detect_path = [tools.chang_int4_int6(self.int4_int6_data, item)
+	# 									for item in detect_path]
+	# 			print('blue_car_detect_path_1={}'.format(tank_car_detect_path))
+	# 			for path_item in tank_car_detect_path:
+	# 				self.obj_interface.setMove(tank_obj[0].ObjID, [path_item])
+	# 				self.updateSDData(LookPos=int(path_item))
+	# 				# 如果发现了敌人，派最符合条件的坦克前去攻击
+	# 				length = len(self.dic_metadata['l_ubops'])
+	# 				# 发现敌人
+	# 				if length:
+	# 					# 坦克回程
+	# 					path_flee = tank_car_detect_path[tank_car_detect_path.index(path_item):]
+	# 					self.obj_interface.setMove(tank_obj[0].ObjID, path_flee)
+	# 					# 坦克发起攻击
+	# 					self.obj_interface.setFire()
+	# 					killing_result = self.shooting_rival_by_tank(self.dic_metadata['l_obops'],
+	# 																 self.rival_record, stage)
+	# 					if length > 1 or killing_result == 0:
+	# 						self.car_detect_path_record.append({'path': detect_path,
+	# 															'canUse': True, 'stage': stage})
+	# 					else:
+	# 						self.car_detect_path_record.append({'path': detect_path,
+	# 															'canUse': False, 'stage': stage})
+	# 					break
 
 	def __del__(self):
 		if self.obj_interface is not None:
